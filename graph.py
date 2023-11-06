@@ -7,11 +7,11 @@ class Graph:
 
     def set_vertex(self, id, vtx):
         if 0 <= id <= self.numvertex:
-            self.vertices[id] = vtx
+            self.vertices[id] = vtx.lower()
 
     def set_edge(self, frm, to, cost=0):
-        frm = self.vertices.index(frm)
-        to = self.vertices.index(to)
+        frm = self.vertices.index(frm.lower())
+        to = self.vertices.index(to.lower())
         self.adj_matrix[frm][to] = cost
 
     def get_vertex(self):
@@ -37,9 +37,11 @@ class Graph:
                 vertex.append(i)
         return vertex
 
-    def BFS(self, s):
+    # Обход в ширину
+    def BFS(self, s, goal='0'):
         # Пометить все вершины как не посещённые
         visited = [False] * len(self.vertices)
+        s = self.vertices.index(s)
 
         # Создание очереди для BFS
         queue = []
@@ -54,7 +56,10 @@ class Graph:
             # Удалить вершину из
             # очереди и вывести её
             s = queue.pop(0)
-            print (s, end = " ")
+            if self.vertices[s]==goal:
+                return True
+
+            print (self.vertices[s], end = " ")
 
             # Получить все смежные вершины отложенной вершины s.
             # Если смежная вершина не была посещена, то пометить
