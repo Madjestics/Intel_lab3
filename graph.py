@@ -1,18 +1,19 @@
 class Graph:
     def __init__(self, numvertex):
         self.adj_matrix = [[-1] * numvertex for x in range(numvertex)]
+        self.vertices = []
         self.numvertex = numvertex
-        self.vertices = [0]*numvertex
 
-
-    def set_vertex(self, id, vtx):
-        if 0 <= id <= self.numvertex:
-            self.vertices[id] = vtx.lower()
+    def set_vertex(self, vtx):
+        if vtx.lower() not in self.vertices:
+            self.vertices.append(vtx.lower())
 
     def set_edge(self, frm, to, cost=0):
         frm = self.vertices.index(frm.lower())
         to = self.vertices.index(to.lower())
         self.adj_matrix[frm][to] = cost
+        if cost=='is a':
+            self.adj_matrix[to][frm] = cost
 
     def get_vertex(self):
         return self.vertices
@@ -37,35 +38,41 @@ class Graph:
                 vertex.append(i)
         return vertex
 
+    def get_vertex_for_ako(self, vrtx):
+        vertex = []
+        for i in range(self.numvertex):
+            for j in range(self.numvertex):
+                if (self.adj_matrix[i][vrtx]=='ako'):
+                    vertex.append(self.vertices[i])
+                    break
+        return vertex
+
     # Обход в ширину
-    def BFS(self, s, goal='0'):
-        # Пометить все вершины как не посещённые
+    def BFS(self, start, goal, connection):
         visited = [False] * len(self.vertices)
-        s = self.vertices.index(s)
-
-        # Создание очереди для BFS
+        s = self.vertices.index(start)
         queue = []
-
-        # Пометить исходный узел как посещённый
-        # и поставить его в очередь
+        edges = []
+        res = []
         queue.append(s)
         visited[s] = True
-
         while queue:
-
-            # Удалить вершину из
-            # очереди и вывести её
             s = queue.pop(0)
-            if self.vertices[s]==goal:
+
+            #для случая с какие
+            if start==goal:
+                if s < self.vertices.index(start):
+                    continue
+                vertex = self.get_vertex_for_ako(s)
+                for i in range(len(vertex)):
+                    res.append(vertex[i])
+            #для остальных вопросов
+            elif self.vertices[s]==goal and connection in edges:
                 return True
-
-            print (self.vertices[s], end = " ")
-
-            # Получить все смежные вершины отложенной вершины s.
-            # Если смежная вершина не была посещена, то пометить
-            # её посещённой и поставить в очередь
             for i in self.get_near_vtx(s):
                 if visited[i] == False:
                     queue.append(i)
+                    edges.append(self.adj_matrix[s][i])
                     visited[i] = True
+        return res
 
